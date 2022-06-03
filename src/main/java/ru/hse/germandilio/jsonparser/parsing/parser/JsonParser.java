@@ -1,12 +1,13 @@
-# JSON Parser #
+package ru.hse.germandilio.jsonparser.parsing.parser;
 
-Used for converting .json files to JsonObject or JsonArray.
+import ru.hse.germandilio.jsonparser.parsing.model.JsonObject;
+import ru.hse.germandilio.jsonparser.utils.JsonDisplayUtils;
+import ru.hse.germandilio.jsonparser.parsing.model.JsonArray;
 
-## API ##
-- Parse json to JsonArray or JsonObject type. 
-```java
+import java.io.IOException;
+import java.io.StringReader;
+
 public class JsonParser {
-    ...
     /**
      * Parse json to {@code JsonArray} or {@code JsonObject} type.
      * @param jsonString {@code String} represented .json file.
@@ -14,20 +15,24 @@ public class JsonParser {
      * @throws IOException I/O exception.
      */
     public static Object fromJSON(String jsonString) throws IOException {
+        var readerWrapper = new ReaderWrapper(new StringReader(jsonString));
+
+        // first step - convert to sequence of tokens
+        var lexicalAnalyzer = new LexicalAnalyzer(readerWrapper);
+        var tokens = lexicalAnalyzer.convertToTokens();
+
+        // second step convert sequence to JSON object
+        var grammarAnalyzer = new GrammarAnalizer();
+        return grammarAnalyzer.parse(tokens);
     }
-    ...
-}
-```
-- Convert from JsonObject ot JsonArray to string.
-```java
-public class JsonParser {
-    ...
+
     /**
      * Converts {@code JsonArray} to {@code String} representation in Json notation.
      * @param array {@code JsonArray} object to convert.
      * @return {@code String}
      */
     public static String toJson(JsonArray array) {
+        return JsonDisplayUtils.convertToString(array);
     }
 
     /**
@@ -36,9 +41,6 @@ public class JsonParser {
      * @return {@code String}
      */
     public static String toJson(JsonObject object) {
+        return JsonDisplayUtils.convertToString(object);
     }
-    ...
 }
-```
-
-Development timing: ~ 25-27 October 2022
